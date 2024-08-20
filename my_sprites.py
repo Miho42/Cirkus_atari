@@ -97,7 +97,7 @@ class Balloon(arcade.Sprite):
         )
 
         # Balloon will wrap if over boarder of screen
-        self.max_pos_x = max_pos_x
+        self.max_pos_x = max_pos_x + self.width/2
 
         # Set self.change_x and self.change_y
         self.forward(speed)
@@ -112,4 +112,4 @@ class Balloon(arcade.Sprite):
 
         # Balloon wrap if over border of screen
         if self.center_x > self.max_pos_x:
-            self.center_x = 0
+            self.center_x = 0 - self.width/2

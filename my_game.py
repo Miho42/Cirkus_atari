@@ -83,6 +83,11 @@ class GameView(arcade.View):
                 # Add new Balloon object to list
                 self.balloon_list.append(new_balloon)
 
+        # Move balloons down
+        # Yes this is the smartest way to do it
+        for b in self.balloon_list:
+            b.center_y -= b.height
+
         # Track the current state of what keys are pressed
         self.left_pressed = False
         self.right_pressed = False
