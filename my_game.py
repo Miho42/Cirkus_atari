@@ -10,7 +10,7 @@ Artwork from https://kenney.nl/assets/space-shooter-redux
 import arcade
 
 # Import sprites from local file my_sprites.py
-from my_sprites import Player, PlayerShot
+from my_sprites import Player, PlayerShot, Balloon
 
 # Set the scaling of all sprites in the game
 SPRITE_SCALING = 0.5
@@ -28,6 +28,9 @@ PLAYER_SHOT_SPEED = 300
 
 FIRE_KEY = arcade.key.SPACE
 
+BALLOON_SPEED = 100
+NO_OF_BALLOON_ROWS = 1
+NO_OF_BALLOONS_IN_ROW = 5
 
 class GameView(arcade.View):
     """
@@ -42,6 +45,9 @@ class GameView(arcade.View):
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = arcade.SpriteList()
 
+        # Variable that will hold list of balloons
+        self.balloon_list = arcade.SpriteList()
+
         # Set up the player info
         self.player_score = 0
         self.player_lives = PLAYER_LIVES
@@ -54,6 +60,28 @@ class GameView(arcade.View):
             max_x_pos=SCREEN_WIDTH,
             scale=SPRITE_SCALING,
         )
+
+        # Create Balloon objects on a line
+        for i in range(NO_OF_BALLOON_ROWS):
+            # + 1 for space above balloons
+            line_no = i
+            space_between_rows = (SCREEN_HEIGHT/4)/NO_OF_BALLOON_ROWS
+            for i in range(NO_OF_BALLOONS_IN_ROW):    
+                space_between_balloons = SCREEN_WIDTH/NO_OF_BALLOONS_IN_ROW
+
+                center_x = 50 + space_between_balloons * i 
+                center_y = SCREEN_HEIGHT - space_between_rows * line_no
+
+                new_balloon = Balloon(
+                    center_x=center_x,
+                    center_y=center_y,
+                    scale = 0.5,
+                    max_pos_x=SCREEN_WIDTH,
+                    speed=BALLOON_SPEED
+                    )
+
+                # Add new Balloon object to list
+                self.balloon_list.append(new_balloon)
 
         # Track the current state of what keys are pressed
         self.left_pressed = False
@@ -100,6 +128,9 @@ class GameView(arcade.View):
         # Draw the player sprite
         self.player.draw()
 
+        # Draw balloons
+        self.balloon_list.draw()
+
         # Draw players score on screen
         arcade.draw_text(
             f"SCORE: {self.player_score}",  # Text to show
@@ -131,6 +162,9 @@ class GameView(arcade.View):
 
         # Update the player shots
         self.player_shot_list.on_update(delta_time)
+
+        # Update balloons
+        self.balloon_list.on_update()
 
         # The game is over when the player scores a 100 points
         if self.player_score >= 100:

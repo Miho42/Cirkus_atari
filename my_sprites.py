@@ -81,3 +81,35 @@ class PlayerShot(arcade.Sprite):
         # Remove shot when over top of screen
         if self.bottom > self.max_y_pos:
             self.kill()
+
+class Balloon(arcade.Sprite):
+    
+    def __init__(self, center_x, center_y, max_pos_x, speed, scale=1):
+        """
+        Setup new ballon
+        """
+
+        super().__init__(
+            center_x=center_x,
+            center_y=center_y,
+            filename="images/ufoBlue.png",
+            scale=scale,
+        )
+
+        # Balloon will wrap if over boarder of screen
+        self.max_pos_x = max_pos_x
+
+        # Set self.change_x and self.change_y
+        self.forward(speed)
+
+    def on_update(self, delta_time):
+        """
+        Move sprite
+        """
+
+        # Update position
+        self.center_x += delta_time * self.change_x
+
+        # Balloon wrap if over border of screen
+        if self.center_x > self.max_pos_x:
+            self.center_x = 0
