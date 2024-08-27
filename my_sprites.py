@@ -84,7 +84,7 @@ class PlayerShot(arcade.Sprite):
 
 class Balloon(arcade.Sprite):
     
-    def __init__(self, center_x, center_y, max_pos_x, speed, scale=1):
+    def __init__(self, center_x, center_y, max_pos_x, min_pos_x, speed, width, height, scale=1):
         """
         Setup new ballon
         """
@@ -97,7 +97,11 @@ class Balloon(arcade.Sprite):
         )
 
         # Balloon will wrap if over boarder of screen
-        self.max_pos_x = max_pos_x + self.width/2
+        self.max_pos_x = max_pos_x
+        self.min_pos_x = min_pos_x
+
+        self.width = width
+        self.height = height
 
         # Set self.change_x and self.change_y
         self.forward(speed)
@@ -112,4 +116,7 @@ class Balloon(arcade.Sprite):
 
         # Balloon wrap if over border of screen
         if self.center_x > self.max_pos_x:
-            self.center_x = 0 - self.width/2
+            self.center_x = self.min_pos_x
+
+        if self.center_x < self.min_pos_x:
+            self.center_x = self.max_pos_x
