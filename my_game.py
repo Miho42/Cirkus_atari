@@ -110,6 +110,8 @@ class GameView(arcade.View):
 
         balloon_max_x = SCREEN_WIDTH + balloon_width
         balloon_min_x = 0 - balloon_width
+
+        # For flipping the direction of each row
         direction = 1
 
         # /4 because balloons takes up 1/4 of screen 
@@ -202,10 +204,6 @@ class GameView(arcade.View):
 
         # Update the player shots
         self.player_shot_list.on_update(delta_time)
-
-        # Update balloons
-        #for balloon_row in self.balloon_list:
-        #    balloon_row.on_update()
 
         self.physics_engine.step()
 

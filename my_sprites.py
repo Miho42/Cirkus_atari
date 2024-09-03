@@ -103,9 +103,6 @@ class Balloon(arcade.Sprite):
         self.width = width
         self.height = height
 
-        # Set self.change_x and self.change_y
-        # self.forward(speed)
-
     def wrap(self):
         if self.center_x > self.max_pos_x:
             return (self.min_pos_x, self.center_y)
@@ -113,16 +110,3 @@ class Balloon(arcade.Sprite):
             return (self.max_pos_x, self.center_y)
         else:
             return False
-
-    """
-    def on_update(self, delta_time):
-        # Update position
-        self.center_x += delta_time * self.change_x
-
-        # Balloon wrap if over border of screen
-        if self.center_x > self.max_pos_x:
-            self.center_x = self.min_pos_x
-
-        if self.center_x < self.min_pos_x:
-            self.center_x = self.max_pos_x
-    """
