@@ -61,6 +61,9 @@ class GameView(arcade.View):
             scale=SPRITE_SCALING,
         )
 
+        # Create physics engine
+        self.physics_engine = arcade.PymunkPhysicsEngine()
+
         # Create balloons
         self.set_up_balloons()
 
@@ -96,6 +99,10 @@ class GameView(arcade.View):
         arcade.set_background_color(arcade.color.AMAZON)
 
     def set_up_balloons(self):
+        """
+        Adds desired number of balloons to list(s),
+        and adds them to physics_engine
+        """
 
         # Size of balloon
         balloon_width = 45
@@ -103,6 +110,9 @@ class GameView(arcade.View):
 
         balloon_max_x = SCREEN_WIDTH + balloon_width
         balloon_min_x = 0 - balloon_width
+
+        # For flipping the direction of each row
+        direction = 1
 
         # /4 because balloons takes up 1/4 of screen 
         spacing_height = (SCREEN_HEIGHT/4)/BALLOON_ROWS
@@ -116,7 +126,6 @@ class GameView(arcade.View):
                 
                 center_x = spacing_width * b
                 center_y = (SCREEN_HEIGHT - spacing_height * row) - balloon_height
-                direction = 1
 
                 if row % 2 == 1:
                     direction = -1
@@ -126,12 +135,21 @@ class GameView(arcade.View):
                     center_y = center_y,
                     max_pos_x = balloon_max_x,
                     min_pos_x = balloon_min_x,
-                    speed = BALLOON_SPEED * direction,
                     width = balloon_width,
                     height = balloon_height
                 )
 
                 self.balloon_list[-1].append(new_balloon)
+
+        for r in self.balloon_list:
+            for b in r:
+                self.physics_engine.add_sprite(
+                    sprite = b,   
+                )
+                self.physics_engine.set_velocity(b, (BALLOON_SPEED * direction, 0))
+            
+            # Flip direction for next row
+            direction *= -1 
 
 
     def on_draw(self):
@@ -183,11 +201,15 @@ class GameView(arcade.View):
         self.player.on_update(delta_time)
 
         # Update the player shots
-        self.player_shot_list.on_update(delta_time)
+        #self.player_shot_list.on_update(delta_time)
 
-        # Update balloons
-        for balloon_row in self.balloon_list:
-            balloon_row.on_update()
+        self.physics_engine.step()
+
+        # Check if balloons should wrap
+        for r in self.balloon_list:
+            for b in r:
+                if (new_pos := b.wrap()) is not False:
+                    self.physics_engine.set_position(b, new_pos)
 
         # The game is over when the player scores a 100 points
         if self.player_score >= 100:
@@ -238,6 +260,12 @@ class GameView(arcade.View):
 
             # Add the new shot to the list of shots
             self.player_shot_list.append(new_shot)
+
+            # Add the new shot to physics engine
+            self.physics_engine.add_sprite(sprite = new_shot)
+            # Speed added in y bc graphics are rotated
+            self.physics_engine.set_velocity(new_shot, (0, PLAYER_SHOT_SPEED))
+
 
     def on_key_release(self, key, modifiers):
         """
