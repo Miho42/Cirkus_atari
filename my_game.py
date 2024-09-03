@@ -149,9 +149,7 @@ class GameView(arcade.View):
                 self.physics_engine.set_velocity(b, (BALLOON_SPEED * direction, 0))
             
             # Flip direction for next row
-            direction *= -1
-
-            
+            direction *= -1 
 
 
     def on_draw(self):
@@ -203,7 +201,7 @@ class GameView(arcade.View):
         self.player.on_update(delta_time)
 
         # Update the player shots
-        self.player_shot_list.on_update(delta_time)
+        #self.player_shot_list.on_update(delta_time)
 
         self.physics_engine.step()
 
@@ -262,6 +260,12 @@ class GameView(arcade.View):
 
             # Add the new shot to the list of shots
             self.player_shot_list.append(new_shot)
+
+            # Add the new shot to physics engine
+            self.physics_engine.add_sprite(sprite = new_shot)
+            # Speed added in y bc graphics are rotated
+            self.physics_engine.set_velocity(new_shot, (0, PLAYER_SHOT_SPEED))
+
 
     def on_key_release(self, key, modifiers):
         """
