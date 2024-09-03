@@ -84,7 +84,7 @@ class PlayerShot(arcade.Sprite):
 
 class Balloon(arcade.Sprite):
     
-    def __init__(self, center_x, center_y, max_pos_x, min_pos_x, speed, width, height, scale=1):
+    def __init__(self, center_x, center_y, max_pos_x, min_pos_x, width, height, scale=1):
         """
         Setup new ballon
         """
@@ -104,13 +104,18 @@ class Balloon(arcade.Sprite):
         self.height = height
 
         # Set self.change_x and self.change_y
-        self.forward(speed)
+        # self.forward(speed)
 
+    def wrap(self):
+        if self.center_x > self.max_pos_x:
+            return (self.min_pos_x, self.center_y)
+        elif self.center_x < self.min_pos_x:
+            return (self.max_pos_x, self.center_y)
+        else:
+            return False
+
+    """
     def on_update(self, delta_time):
-        """
-        Move sprite
-        """
-
         # Update position
         self.center_x += delta_time * self.change_x
 
@@ -120,3 +125,4 @@ class Balloon(arcade.Sprite):
 
         if self.center_x < self.min_pos_x:
             self.center_x = self.max_pos_x
+    """
