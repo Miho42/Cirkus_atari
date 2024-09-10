@@ -10,7 +10,7 @@ Artwork from https://kenney.nl/assets/space-shooter-redux
 import arcade
 
 # Import sprites from local file my_sprites.py
-from my_sprites import Player, PlayerShot, Balloon
+from my_sprites import Player, PlayerShot, Balloon, Wall
 
 # Set the scaling of all sprites in the game
 SPRITE_SCALING = 0.5
@@ -29,7 +29,7 @@ PLAYER_SHOT_SPEED = 300
 FIRE_KEY = arcade.key.SPACE
 
 BALLOON_SPEED = 100
-BALLOON_ROWS = 3
+BALLOON_ROWS = 2
 BALLOON_IN_ROW = 8
 
 class GameView(arcade.View):
@@ -47,6 +47,9 @@ class GameView(arcade.View):
 
         # Variable that will hold lists of balloons
         self.balloon_list = []
+
+        # List for walls
+        self.walls = arcade.SpriteList()
 
         # Set up the player info
         self.player_score = 0
@@ -66,6 +69,10 @@ class GameView(arcade.View):
 
         # Create balloons
         self.set_up_balloons()
+
+        # Create walls
+        self.walls.append(self.make_wall(SCREEN_WIDTH/2, SCREEN_HEIGHT, SCREEN_WIDTH, 20))
+        self.walls.append(self.make_wall(SCREEN_WIDTH/2, 0, SCREEN_WIDTH, 20))
 
         # Track the current state of what keys are pressed
         self.left_pressed = False
@@ -144,13 +151,29 @@ class GameView(arcade.View):
         for r in self.balloon_list:
             for b in r:
                 self.physics_engine.add_sprite(
-                    sprite = b,   
+                    sprite = b,
+                    elasticity=1
                 )
                 self.physics_engine.set_velocity(b, (BALLOON_SPEED * direction, 0))
             
             # Flip direction for next row
             direction *= -1 
 
+    def make_wall(self, pos_x, pos_y, width, height):
+        wall = Wall(
+            pos_x,
+            pos_y,
+            width,
+            height
+        )
+
+        self.physics_engine.add_sprite(
+            sprite=wall,
+            elasticity=1,
+            body_type=arcade.PymunkPhysicsEngine.STATIC
+            )
+        
+        return wall
 
     def on_draw(self):
         """
@@ -170,6 +193,8 @@ class GameView(arcade.View):
         for ballon_row in self.balloon_list:
             ballon_row.draw()
 
+        # Draw wall
+        self.walls.draw()
 
         # Draw players score on screen
         arcade.draw_text(
@@ -200,9 +225,7 @@ class GameView(arcade.View):
         # Update player sprite
         self.player.on_update(delta_time)
 
-        # Update the player shots
-        #self.player_shot_list.on_update(delta_time)
-
+        # Update sprites
         self.physics_engine.step()
 
         # Check if balloons should wrap

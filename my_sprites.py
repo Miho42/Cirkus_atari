@@ -110,3 +110,22 @@ class Balloon(arcade.Sprite):
             return (self.max_pos_x, self.center_y)
         else:
             return False
+        
+class Wall(arcade.Sprite):
+    
+    def __init__(self, center_x, center_y, width, height):
+        """
+        Setup wall
+        """
+
+        texture = arcade.Texture.create_filled(
+            name="wall",
+            size=(width, height),
+            color=arcade.color.BLACK
+        )
+
+        super().__init__(
+            center_x=center_x,
+            center_y=center_y,
+            texture=texture
+        )
