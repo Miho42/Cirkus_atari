@@ -175,6 +175,22 @@ class GameView(arcade.View):
         
         return wall
 
+
+    def flip_acrobat(self):
+        """
+        Flips the acrobat if needed
+        """    
+    
+        for a in self.player_shot_list:
+            # Get acrobat physics object
+            acrobat_sprite = self.physics_engine.get_physics_object(a)
+            # Get velocity og the acrobat physics object
+            acrobat_velocity = acrobat_sprite.body.velocity
+
+            if a.center_x > SCREEN_WIDTH or a.center_x < 0:
+                self.physics_engine.set_velocity(a, (acrobat_velocity[0] * -1, acrobat_velocity[1]))
+        
+
     def on_draw(self):
         """
         Render the screen.
@@ -228,15 +244,20 @@ class GameView(arcade.View):
         # Update sprites
         self.physics_engine.step()
 
+        # Flip arobat(s) if needed
+        self.flip_acrobat()
+
         # Check if balloons should wrap
         for r in self.balloon_list:
             for b in r:
                 if (new_pos := b.wrap()) is not False:
                     self.physics_engine.set_position(b, new_pos)
 
+        """
         # The game is over when the player scores a 100 points
         if self.player_score >= 100:
             self.game_over()
+        """
 
     def game_over(self):
         """
