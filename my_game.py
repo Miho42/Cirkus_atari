@@ -152,7 +152,8 @@ class GameView(arcade.View):
             for b in r:
                 self.physics_engine.add_sprite(
                     sprite = b,
-                    elasticity=1
+                    elasticity=1,
+                    gravity=(0,0)
                 )
                 self.physics_engine.set_velocity(b, (BALLOON_SPEED * direction, 0))
             
@@ -174,6 +175,22 @@ class GameView(arcade.View):
             )
         
         return wall
+
+
+    def flip_acrobat(self):
+        """
+        Flips the acrobat if needed
+        """    
+    
+        for a in self.player_shot_list:
+            # Get acrobat physics object
+            acrobat_sprite = self.physics_engine.get_physics_object(a)
+            # Get velocity og the acrobat physics object
+            acrobat_velocity = acrobat_sprite.body.velocity
+
+            if a.center_x > SCREEN_WIDTH or a.center_x < 0:
+                self.physics_engine.set_velocity(a, (acrobat_velocity[0] * -1, acrobat_velocity[1]))
+        
 
     def on_draw(self):
         """
@@ -209,6 +226,8 @@ class GameView(arcade.View):
         Movement and game logic
         """
 
+        # Vent prøv og hør en genial idé, når man rammer balloon skal der laves en "emitter" af små objects i physics engine der går ned og hopper i bunden
+
         # Calculate player speed based on the keys pressed
         self.player.change_x = 0
 
@@ -228,15 +247,20 @@ class GameView(arcade.View):
         # Update sprites
         self.physics_engine.step()
 
+        # Flip arobat(s) if needed
+        self.flip_acrobat()
+
         # Check if balloons should wrap
         for r in self.balloon_list:
             for b in r:
                 if (new_pos := b.wrap()) is not False:
                     self.physics_engine.set_position(b, new_pos)
 
+        """
         # The game is over when the player scores a 100 points
         if self.player_score >= 100:
             self.game_over()
+        """
 
     def game_over(self):
         """
@@ -285,7 +309,11 @@ class GameView(arcade.View):
             self.player_shot_list.append(new_shot)
 
             # Add the new shot to physics engine
-            self.physics_engine.add_sprite(sprite = new_shot)
+            self.physics_engine.add_sprite(
+                sprite = new_shot,
+                gravity=(0, -100),
+                elasticity=0.9
+                )
             # Speed added in y bc graphics are rotated
             self.physics_engine.set_velocity(new_shot, (0, PLAYER_SHOT_SPEED))
 
