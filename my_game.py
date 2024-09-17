@@ -152,7 +152,8 @@ class GameView(arcade.View):
             for b in r:
                 self.physics_engine.add_sprite(
                     sprite = b,
-                    elasticity=1
+                    elasticity=1,
+                    gravity=(0,0)
                 )
                 self.physics_engine.set_velocity(b, (BALLOON_SPEED * direction, 0))
             
@@ -224,6 +225,8 @@ class GameView(arcade.View):
         """
         Movement and game logic
         """
+
+        # Vent prøv og hør en genial idé, når man rammer balloon skal der laves en "emitter" af små objects i physics engine der går ned og hopper i bunden
 
         # Calculate player speed based on the keys pressed
         self.player.change_x = 0
@@ -306,7 +309,11 @@ class GameView(arcade.View):
             self.player_shot_list.append(new_shot)
 
             # Add the new shot to physics engine
-            self.physics_engine.add_sprite(sprite = new_shot)
+            self.physics_engine.add_sprite(
+                sprite = new_shot,
+                gravity=(0, -100),
+                elasticity=0.9
+                )
             # Speed added in y bc graphics are rotated
             self.physics_engine.set_velocity(new_shot, (0, PLAYER_SHOT_SPEED))
 
