@@ -153,7 +153,8 @@ class GameView(arcade.View):
                 self.physics_engine.add_sprite(
                     sprite = b,
                     elasticity=1,
-                    gravity=(0,0)
+                    gravity=(0,0),
+                    collision_type="Balloon"
                 )
                 self.physics_engine.set_velocity(b, (BALLOON_SPEED * direction, 0))
             
@@ -171,7 +172,8 @@ class GameView(arcade.View):
         self.physics_engine.add_sprite(
             sprite=wall,
             elasticity=1,
-            body_type=arcade.PymunkPhysicsEngine.STATIC
+            body_type=arcade.PymunkPhysicsEngine.STATIC,
+            collision_type="Wall"
             )
         
         return wall
@@ -190,6 +192,19 @@ class GameView(arcade.View):
 
             if a.center_x > SCREEN_WIDTH or a.center_x < 0:
                 self.physics_engine.set_velocity(a, (acrobat_velocity[0] * -1, acrobat_velocity[1]))
+
+    def collision_acrobat_balloon(self, sprite_acrobat, sprite_balloon, arbiter, space, data):
+        """
+        Kill balloon in collision with acrobat
+        """
+        sprite_balloon.kill()
+
+    def collision_acrobat_wall(self, sprite_acrobat, sprite_balloon, arbiter, space, data):
+        sprite_acrobat.life -= 1
+
+        if sprite_acrobat.life < 1:
+            sprite_acrobat.kill()
+
         
 
     def on_draw(self):
@@ -256,6 +271,19 @@ class GameView(arcade.View):
                 if (new_pos := b.wrap()) is not False:
                     self.physics_engine.set_position(b, new_pos)
 
+        # Kill balloon if collision with acrobat
+        self.physics_engine.add_collision_handler(
+            first_type="Acrobat",
+            second_type="Balloon",
+            post_handler=self.collision_acrobat_balloon
+        )
+
+        self.physics_engine.add_collision_handler(
+            first_type="Acrobat",
+            second_type="Wall",
+            post_handler=self.collision_acrobat_wall
+        )
+
         """
         # The game is over when the player scores a 100 points
         if self.player_score >= 100:
@@ -312,7 +340,8 @@ class GameView(arcade.View):
             self.physics_engine.add_sprite(
                 sprite = new_shot,
                 gravity=(0, -100),
-                elasticity=0.9
+                elasticity=0.9,
+                collision_type="Acrobat"
                 )
             # Speed added in y bc graphics are rotated
             self.physics_engine.set_velocity(new_shot, (0, PLAYER_SHOT_SPEED))

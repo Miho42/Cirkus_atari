@@ -66,6 +66,9 @@ class PlayerShot(arcade.Sprite):
         # Shoot points in this direction
         self.angle = start_angle
 
+        # Life of acrobat
+        self.life = 3
+
         # Shot moves forward. Sets self.change_x and self.change_y
         self.forward(speed)
 
