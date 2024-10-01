@@ -1,4 +1,5 @@
 import arcade
+import arcade.color
 
 
 class Player(arcade.Sprite):
@@ -95,7 +96,11 @@ class Balloon(arcade.Sprite):
         super().__init__(
             center_x=center_x,
             center_y=center_y,
-            filename="images/ufoBlue.png",
+            texture=arcade.Texture.create_filled(
+                name="balloon",
+                size=(30,30),
+                color=arcade.color.BLUE_SAPPHIRE
+            ),
             scale=scale,
         )
 

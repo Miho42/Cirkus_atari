@@ -8,6 +8,7 @@ Artwork from https://kenney.nl/assets/space-shooter-redux
 """
 
 import arcade
+import arcade.color
 
 # Import sprites from local file my_sprites.py
 from my_sprites import Player, PlayerShot, Balloon, Wall
@@ -50,6 +51,9 @@ class GameView(arcade.View):
 
         # List for walls
         self.walls = arcade.SpriteList()
+
+        # List for emitters
+        self.emitter_list = []
 
         # Set up the player info
         self.player_score = 0
@@ -197,6 +201,28 @@ class GameView(arcade.View):
         """
         Kill balloon in collision with acrobat
         """
+
+        texture_blue = arcade.Texture.create_filled(
+                name="explosion1",
+                size=(20,20),
+                color=arcade.color.BLUE_SAPPHIRE
+            )
+        
+        texture_green = arcade.Texture.create_filled(
+            name="explosion2",
+            size=(5,5),
+            color=arcade.color.GREEN,
+        )
+        
+        emitter = arcade.make_burst_emitter(
+            center_xy=(sprite_balloon.center_x, sprite_balloon.center_y),
+            filenames_and_textures=[texture_green, texture_blue],
+            particle_count=15,
+            particle_speed=2,
+            particle_lifetime_min=0.4,
+            particle_lifetime_max=2,
+        )
+        self.emitter_list.append(emitter)
         sprite_balloon.kill()
 
     def collision_acrobat_wall(self, sprite_acrobat, sprite_balloon, arbiter, space, data):
@@ -228,6 +254,10 @@ class GameView(arcade.View):
         # Draw wall
         self.walls.draw()
 
+        # Draw emitter(s)
+        for e in self.emitter_list:
+            e.draw()
+
         # Draw players score on screen
         arcade.draw_text(
             f"SCORE: {self.player_score}",  # Text to show
@@ -240,8 +270,6 @@ class GameView(arcade.View):
         """
         Movement and game logic
         """
-
-        # Vent prøv og hør en genial idé, når man rammer balloon skal der laves en "emitter" af små objects i physics engine der går ned og hopper i bunden
 
         # Calculate player speed based on the keys pressed
         self.player.change_x = 0
@@ -265,6 +293,10 @@ class GameView(arcade.View):
         # Flip arobat(s) if needed
         self.flip_acrobat()
 
+        # Update emitters
+        for e in self.emitter_list:
+            e.update()
+
         # Check if balloons should wrap
         for r in self.balloon_list:
             for b in r:
@@ -284,11 +316,6 @@ class GameView(arcade.View):
             post_handler=self.collision_acrobat_wall
         )
 
-        """
-        # The game is over when the player scores a 100 points
-        if self.player_score >= 100:
-            self.game_over()
-        """
 
     def game_over(self):
         """
