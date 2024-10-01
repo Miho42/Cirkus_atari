@@ -1,4 +1,5 @@
 import arcade
+import arcade.color
 
 
 class Player(arcade.Sprite):
@@ -66,6 +67,9 @@ class PlayerShot(arcade.Sprite):
         # Shoot points in this direction
         self.angle = start_angle
 
+        # Life of acrobat
+        self.life = 3
+
         # Shot moves forward. Sets self.change_x and self.change_y
         self.forward(speed)
 
@@ -92,7 +96,11 @@ class Balloon(arcade.Sprite):
         super().__init__(
             center_x=center_x,
             center_y=center_y,
-            filename="images/ufoBlue.png",
+            texture=arcade.Texture.create_filled(
+                name="balloon",
+                size=(30,30),
+                color=arcade.color.BLUE_SAPPHIRE
+            ),
             scale=scale,
         )
 
